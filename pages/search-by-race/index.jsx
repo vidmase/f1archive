@@ -63,7 +63,7 @@ export default function SearchByRace() {
         alt="F1 Background"
         priority
       />
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
       <div className="relative z-10 flex flex-col justify-center items-center min-h-screen px-4">
         <Navbar />
         <div className="container mx-auto">
