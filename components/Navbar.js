@@ -7,6 +7,7 @@ const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [drivers, setDrivers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,13 +26,16 @@ const Navbar = () => {
 
   const fetchDrivers = async () => {
     if (drivers.length === 0) {
+      setIsLoading(true);
       try {
-        const response = await fetch('http://ergast.com/api/f1/current/drivers.json');
+        const response = await fetch('/api/drivers');  // Updated this line
         const data = await response.json();
         const driverList = data.MRData.DriverTable.Drivers;
         setDrivers(driverList);
       } catch (error) {
         console.error('Error fetching drivers:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
     setIsDropdownOpen(!isDropdownOpen);
