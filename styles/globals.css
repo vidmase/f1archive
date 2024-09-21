@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lora&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-michroma;
+  }
+
+  .subheading {
+    @apply font-yanone-kaffeesatz;
+  }
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 38, 38, 38;
+  --background-end-rgb: 28, 28, 28;
+  --primary-red: #e10600;
+  --secondary-gray: #333333;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+p {
+  font-family: 'Lora', serif;
+}
+
+/* Animista animations */
+.text-focus-in {
+  animation: text-focus-in 3s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+  animation-delay: 0s;
+}
+
+.slide-in-top {
+  animation: slide-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+.heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite both;
+}
+
+.scale-up-center:hover {
+  animation: scale-up-center 0.7s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+
+.tracking-in-expand {
+  animation: tracking-in-expand 0.7s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+}
+
+.fade-in {
+  animation: fade-in 4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+
+.slide-in-blurred-left {
+  -webkit-animation: slide-in-blurred-left 5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+  animation: slide-in-blurred-left 5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+}
+
+/* Add Animista keyframes here */
+@keyframes text-focus-in {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+  }
+
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+/* Add other Animista keyframes for slide-in-top, heartbeat, scale-up-center, tracking-in-expand, and fade-in */
+
+@keyframes slide-in-blurred-left {
+  0% {
+    -webkit-transform: translateX(-1000px) scaleX(2.5) scaleY(0.2);
+    transform: translateX(-1000px) scaleX(2.5) scaleY(0.2);
+    -webkit-transform-origin: 100% 50%;
+    transform-origin: 100% 50%;
+    -webkit-filter: blur(40px);
+    filter: blur(40px);
+    opacity: 0;
+  }
+
+  100% {
+    -webkit-transform: translateX(0) scaleY(1) scaleX(1);
+    transform: translateX(0) scaleY(1) scaleX(1);
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-filter: blur(0);
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+/* Custom styles for select elements */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.5em 1.5em;
+}
+
+.shine-button {
+  z-index: 1;
+  position: relative;
+  font-size: inherit;
+  font-family: inherit;
+  color: white;
+  padding: 0.5em 1em;
+  outline: none;
+  border: none;
+  background-color: #e10600;
+  /* F1 red color */
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  /* Slightly rounded corners */
+}
+
+.shine-button::after {
+  content: '';
+  z-index: -1;
+  background-color: hsla(0, 0%, 100%, 0.2);
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  width: 1.25em;
+  transform: translate3d(-525%, 0, 0) rotate(35deg);
+}
+
+.shine-button:hover::after {
+  transition: transform 0.45s ease-in-out;
+  transform: translate3d(200%, 0, 0) rotate(35deg);
+}
+
+.shine-button:hover {
+  background-color: #b30500;
+  /* Darker red on hover */
+}
+
+.shine-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shine-button:disabled:hover::after {
+  transform: translate3d(-525%, 0, 0) rotate(35deg);
+}
+
+.dropdown-container {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+@keyframes moveToCenter {
+  0% {
+    transform: translateX(-100vw);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.f1-logo-animation {
+  animation: moveToCenter 3s ease-out forwards;
+}
+
+.dropdown-container {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu {
+  right: 0;
+  left: auto;
+}
