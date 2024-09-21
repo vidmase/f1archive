@@ -64,11 +64,11 @@ const Navbar = () => {
         </div>
       </div>
       {isSearchByRacePage && router.pathname !== '/search-by-race' && (
-        <div className="absolute top-4 right-10 lg:right-16 xl:right-72">
+        <div className="absolute top-4 right-4 sm:right-10 lg:right-16 xl:right-72">
           <div className="relative">
             <button
               onClick={fetchDrivers}
-              className="text-white hover:text-red-500 transition duration-300 focus:outline-none"
+              className="text-white hover:text-red-500 transition duration-300 focus:outline-none text-sm sm:text-base"
             >
               Driver Stats ▼
             </button>

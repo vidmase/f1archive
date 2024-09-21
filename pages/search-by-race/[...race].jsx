@@ -135,18 +135,18 @@ const RaceResults = ({ data, lapTimes }) => {
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
-      <div className="mt-10 px-12 lg:px-24 xl:px-80 w-screen text-xl">
+      <div className="mt-10 px-4 sm:px-8 lg:px-24 xl:px-80 w-full text-xl">
         <Link href="/search-by-race" className="text-red-600 hover:text-red-400 transition duration-300">
           &lt; Return to Search
         </Link>
       </div>
-      <div className="flex justify-center w-screen">
+      <div className="flex justify-center w-full px-4 sm:px-8">
         {data.RaceData.MRData.RaceTable.Races.length > 0 && (
-          <div className="animate-fade w-3/4 xl:w-3/5 mt-8 mb-10 bg-gray-900 p-8 rounded-lg">
+          <div className="animate-fade w-full sm:w-3/4 xl:w-3/5 mt-8 mb-10 bg-gray-900 p-4 sm:p-8 rounded-lg">
             {/* Race info */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
               <div>
-                <div className="font-extrabold text-xl lg:text-4xl">
+                <div className="font-extrabold text-xl sm:text-2xl lg:text-4xl">
                   {data.RaceData.MRData.RaceTable.season}{" "}
                   {data.RaceData.MRData.RaceTable.Races[0].raceName}
                 </div>
@@ -154,7 +154,7 @@ const RaceResults = ({ data, lapTimes }) => {
                   {data.RaceData.MRData.RaceTable.Races[0].Circuit.circuitName}
                 </div>
               </div>
-              <div>
+              <div className="mt-4 sm:mt-0">
                 {data.countryImage && (
                   <Image
                     width={75}
@@ -165,8 +165,8 @@ const RaceResults = ({ data, lapTimes }) => {
                 )}
               </div>
             </div>
-            <div className="flex items-center justify-between ">
-              <div className="w-1/2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4">
+              <div className="w-full sm:w-1/2">
                 <div>
                   {" "}
                   <span className="font-bold">Date:</span>{" "}
@@ -177,7 +177,7 @@ const RaceResults = ({ data, lapTimes }) => {
                   {data.RaceData.MRData.RaceTable.Races[0].round}
                 </div>
               </div>
-              <div>
+              <div className="w-full sm:w-1/2 mt-4 sm:mt-0">
                 <div className="text-end">
                   <span className="font-bold"> Laps:</span>{" "}
                   {data.circuitData?.response[0]?.laps}

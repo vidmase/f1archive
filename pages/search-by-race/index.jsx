@@ -64,14 +64,14 @@ export default function SearchByRace() {
         priority
       />
       <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-      <div className="relative z-10 flex flex-col justify-center items-center min-h-screen">
+      <div className="relative z-10 flex flex-col justify-center items-center min-h-screen px-4">
         <Navbar />
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto">
           <div className="flex flex-col items-center justify-center">
-            <h1 className={`${michroma.className} text-6xl font-bold text-center text-red-600 mb-20`}>
+            <h1 className={`${michroma.className} text-4xl sm:text-5xl md:text-6xl font-bold text-center text-red-600 mb-10 sm:mb-20`}>
               Search by Race
             </h1>
-            <div className="flex justify-center items-start space-x-8 w-full max-w-2xl mb-8">
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 w-full max-w-2xl mb-8">
               <F1Select
                 id="Year"
                 options={RaceYears}
@@ -86,11 +86,11 @@ export default function SearchByRace() {
               />
             </div>
             <button
-              className={`shine-button ${invalidInput ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`shine-button ${invalidInput ? "opacity-50 cursor-not-allowed" : ""} w-full sm:w-auto`}
               onClick={handleSearch}
               disabled={invalidInput}
             >
-              Enter
+              Shine
             </button>
           </div>
         </div>
