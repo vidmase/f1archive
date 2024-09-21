@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from "react";
 import F1Select from "@/components/F1Select";
 import Navbar from "@/components/Navbar";
-import React, { useEffect, useState } from "react";
 import { RaceYears } from "@/utils/Constants";
 import Image from "next/image";
 import { Michroma } from "next/font/google";
@@ -18,34 +18,32 @@ export default function SearchByRace() {
 
   const getCiruits = async (selectedYear) => {
     if (selectedYear !== "Choose a Year" && selectedYear !== null) {
-      const response = await fetch(`api/getRespectiveCircuits/${selectedYear}`);
-      const data = await response.json();
-      setCircuits(data);
-      setLoading(false);
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/getRespectiveCircuits/${selectedYear}`);
+        const data = await response.json();
+        setCircuits(data);
+      } catch (error) {
+        console.error("Error fetching circuits:", error);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setCircuits([]);
-      setLoading(false);
     }
   };
 
-  // Update selected circuits everytime selected year is changed
   useEffect(() => {
-    setLoading(true);
     getCiruits(selectedYear);
   }, [selectedYear]);
 
-  // Check to see if button should be enabled
   useEffect(() => {
-    if (
+    setInvalidInput(
       selectedYear === "Choose a Year" ||
       selectedYear === null ||
       selectedCircuit === "Choose a Circuit" ||
       selectedCircuit === null
-    ) {
-      setInvalidInput(true);
-    } else {
-      setInvalidInput(false);
-    }
+    );
   }, [selectedYear, selectedCircuit]);
 
   const handleSearch = (e) => {
@@ -58,7 +56,7 @@ export default function SearchByRace() {
   return (
     <div className="relative min-h-screen">
       <Image
-        src="/assets/images/f1-background2.png"
+        src="/assets/images/f1-background3.png"
         layout="fill"
         objectFit="cover"
         quality={100}
@@ -92,7 +90,7 @@ export default function SearchByRace() {
               onClick={handleSearch}
               disabled={invalidInput}
             >
-              Enter
+              Shine
             </button>
           </div>
         </div>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import axios from 'axios';
 
 const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
@@ -28,10 +29,14 @@ const Navbar = () => {
     if (drivers.length === 0) {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/drivers');  // Updated this line
-        const data = await response.json();
-        const driverList = data.MRData.DriverTable.Drivers;
-        setDrivers(driverList);
+        console.log('Fetching drivers...');
+        const response = await axios.get('/api/drivers');
+        console.log('Drivers response:', response.data);
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setDrivers(response.data);
+        } else {
+          console.error('Received invalid drivers data:', response.data);
+        }
       } catch (error) {
         console.error('Error fetching drivers:', error);
       } finally {
@@ -58,7 +63,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {isSearchByRacePage && (
+      {isSearchByRacePage && router.pathname !== '/search-by-race' && (
         <div className="absolute top-4 right-10 lg:right-16 xl:right-72">
           <div className="relative">
             <button
@@ -67,7 +72,7 @@ const Navbar = () => {
             >
               Driver Stats ▼
             </button>
-            {isDropdownOpen && (
+            {isDropdownOpen && !isLoading && drivers.length > 0 && (
               <div className="dropdown-container">
                 <ul className="dropdown-menu w-48 bg-black bg-opacity-80 rounded-md shadow-lg py-1 z-50 max-h-96 overflow-y-auto">
                   {drivers.map((driver) => (
@@ -83,6 +88,8 @@ const Navbar = () => {
                 </ul>
               </div>
             )}
+            {isLoading && <p className="text-white">Loading...</p>}
+            {!isLoading && drivers.length === 0 && <p className="text-white">No data available</p>}
           </div>
         </div>
       )}
