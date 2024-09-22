@@ -90,7 +90,7 @@ export default function SearchByRace() {
               onClick={handleSearch}
               disabled={invalidInput}
             >
-              Shine
+              Enter
             </button>
           </div>
         </div>

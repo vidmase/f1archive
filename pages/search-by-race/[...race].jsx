@@ -74,6 +74,7 @@ export default function RaceResults() {
         <h1 className="text-3xl font-bold mb-6 mt-16">{raceData.raceName}</h1>
         <div className="mt-8"> {/* Added margin top here */}
           <h2 className="text-2xl font-bold mb-4">Race Results</h2>
+
           <RaceResultsTable results={raceData.Results} />
         </div>
         <div className="mt-12">
