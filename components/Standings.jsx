@@ -54,7 +54,11 @@ const Standings = ({ year }) => {
                         </thead>
                         <tbody>
                             {driverStandings.map((driver, index) => (
-                                <tr key={index} className="border-t border-gray-700">
+                                <tr
+                                    key={index}
+                                    className="border-t border-gray-700 animate-text-focus-in"
+                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                >
                                     <td className="py-2 px-4">{driver.position}</td>
                                     <td className="py-2 px-4">{driver.Driver.givenName} {driver.Driver.familyName}</td>
                                     <td className="py-2 px-4">{driver.points}</td>
@@ -77,7 +81,11 @@ const Standings = ({ year }) => {
                         </thead>
                         <tbody>
                             {constructorStandings.map((constructor, index) => (
-                                <tr key={index} className="border-t border-gray-700">
+                                <tr
+                                    key={index}
+                                    className="border-t border-gray-700 animate-text-focus-in"
+                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                >
                                     <td className="py-2 px-4">{constructor.position}</td>
                                     <td className="py-2 px-4">{constructor.Constructor.name}</td>
                                     <td className="py-2 px-4">{constructor.points}</td>
