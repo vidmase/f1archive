@@ -6,7 +6,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/Table";
 
 const RaceResultsTable = ({ results }) => {
     if (!results || results.length === 0) {
@@ -37,7 +37,7 @@ const RaceResultsTable = ({ results }) => {
                             style={{ animationDelay: `${index * 0.05}s` }}
                         >
                             <TableCell className="text-white">{result.position}</TableCell>
-                            <TableCell className="text-white">{result.Driver.permanentNumber}</TableCell>
+                            <TableCell className="text-white">{result.Driver.permanentNumber || 'N/A'}</TableCell>
                             <TableCell className="text-white">{`${result.Driver.givenName} ${result.Driver.familyName}`}</TableCell>
                             <TableCell className="text-white">{result.Constructor.name}</TableCell>
                             <TableCell className="text-white">{result.grid}</TableCell>

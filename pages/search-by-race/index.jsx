@@ -5,10 +5,15 @@ import { RaceYears } from "@/utils/Constants";
 import Image from "next/image";
 import { Michroma } from "next/font/google";
 import { useRouter } from 'next/router';
+import { Titillium_Web } from "next/font/google";
+import Button from "@/components/ui/Button";
+import Standings from "@/components/Standings";
+
 
 const michroma = Michroma({ subsets: ["latin"], weight: ["400"] });
+const titilliumWeb = Titillium_Web({ subsets: ["latin"], weight: ["400"] });
 
-export default function SearchByRace() {
+export default function SearchByRace({ titilliumWebClass }) {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCircuit, setSelectedCircuit] = useState("");
   const [circuits, setCircuits] = useState([]);

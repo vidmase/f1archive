@@ -46,18 +46,34 @@ export default function RaceResults() {
     }
   }, [race]);
 
+  const handleReturnToSearch = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    router.push('/search-by-race').then(() => {
+      setIsLoading(false);
+    });
+  };
+
   if (!raceData || !lapTimes) {
     return <div>Loading...</div>;
   }
 
-  const year = race[0];
-
   return (
     <div className="min-h-screen bg-black text-white bg-[url('/assets/images/f1-background3.png')] bg-cover bg-center bg-fixed">
+      <div className="fixed top-4 left-4 z-50">
+        <Link
+          href="/search-by-race"
+          onClick={handleReturnToSearch}
+          className={`bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          aria-disabled={isLoading}
+        >
+          {isLoading ? 'Returning...' : 'Return to Search'}
+        </Link>
+      </div>
       <Navbar />
       <div className="container mx-auto px-4 py-8 bg-black bg-opacity-75">
         <h1 className="text-3xl font-bold mb-6 mt-16">{raceData.raceName}</h1>
-        <div className="mt-8"> {/* Added margin top here */}
+        <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Race Results</h2>
           <RaceResultsTable results={raceData.Results} />
         </div>
@@ -66,7 +82,8 @@ export default function RaceResults() {
           <LapTimeComparison raceData={raceData} lapTimes={lapTimes} />
         </div>
         <div className="mt-12">
-          <Standings year={year} />
+          <h2 className="text-2xl font-bold mb-4">Current Standings</h2>
+          <Standings year={raceData.season} />
         </div>
       </div>
     </div>

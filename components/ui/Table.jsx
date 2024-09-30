@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Table = ({ children, ...props }) => (
-    <table className="w-full border-collapse" {...props}>
+const Table = ({ children, className, ...props }) => (
+    <table className={`w-full border-collapse ${className}`} {...props}>
         {children}
     </table>
 );

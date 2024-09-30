@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const Standings = ({ year }) => {
     const [driverStandings, setDriverStandings] = useState([]);
@@ -8,19 +8,25 @@ const Standings = ({ year }) => {
     useEffect(() => {
         const fetchStandings = async () => {
             try {
+                console.log(`Fetching driver standings for year: ${year}`);
                 const driverResponse = await fetch(`https://ergast.com/api/f1/${year}/driverStandings.json`);
                 const driverData = await driverResponse.json();
+                console.log('Driver Standings Data:', driverData);
                 setDriverStandings(driverData.MRData.StandingsTable.StandingsLists[0].DriverStandings);
 
+                console.log(`Fetching constructor standings for year: ${year}`);
                 const constructorResponse = await fetch(`https://ergast.com/api/f1/${year}/constructorStandings.json`);
                 const constructorData = await constructorResponse.json();
+                console.log('Constructor Standings Data:', constructorData);
                 setConstructorStandings(constructorData.MRData.StandingsTable.StandingsLists[0].ConstructorStandings);
             } catch (error) {
                 console.error('Error fetching standings:', error);
             }
         };
 
-        fetchStandings();
+        if (year) {
+            fetchStandings();
+        }
     }, [year]);
 
     const handleStandingsChange = (event) => {
