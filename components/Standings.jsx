@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Standings = ({ year }) => {
     const [driverStandings, setDriverStandings] = useState([]);
@@ -8,25 +8,19 @@ const Standings = ({ year }) => {
     useEffect(() => {
         const fetchStandings = async () => {
             try {
-                console.log(`Fetching driver standings for year: ${year}`);
                 const driverResponse = await fetch(`https://ergast.com/api/f1/${year}/driverStandings.json`);
                 const driverData = await driverResponse.json();
-                console.log('Driver Standings Data:', driverData);
                 setDriverStandings(driverData.MRData.StandingsTable.StandingsLists[0].DriverStandings);
 
-                console.log(`Fetching constructor standings for year: ${year}`);
                 const constructorResponse = await fetch(`https://ergast.com/api/f1/${year}/constructorStandings.json`);
                 const constructorData = await constructorResponse.json();
-                console.log('Constructor Standings Data:', constructorData);
                 setConstructorStandings(constructorData.MRData.StandingsTable.StandingsLists[0].ConstructorStandings);
             } catch (error) {
                 console.error('Error fetching standings:', error);
             }
         };
 
-        if (year) {
-            fetchStandings();
-        }
+        fetchStandings();
     }, [year]);
 
     const handleStandingsChange = (event) => {
@@ -60,11 +54,7 @@ const Standings = ({ year }) => {
                         </thead>
                         <tbody>
                             {driverStandings.map((driver, index) => (
-                                <tr
-                                    key={index}
-                                    className="border-t border-gray-700 animate-text-focus-in"
-                                    style={{ animationDelay: `${index * 0.05}s` }}
-                                >
+                                <tr key={index} className="border-t border-gray-700">
                                     <td className="py-2 px-4">{driver.position}</td>
                                     <td className="py-2 px-4">{driver.Driver.givenName} {driver.Driver.familyName}</td>
                                     <td className="py-2 px-4">{driver.points}</td>
@@ -87,11 +77,7 @@ const Standings = ({ year }) => {
                         </thead>
                         <tbody>
                             {constructorStandings.map((constructor, index) => (
-                                <tr
-                                    key={index}
-                                    className="border-t border-gray-700 animate-text-focus-in"
-                                    style={{ animationDelay: `${index * 0.05}s` }}
-                                >
+                                <tr key={index} className="border-t border-gray-700">
                                     <td className="py-2 px-4">{constructor.position}</td>
                                     <td className="py-2 px-4">{constructor.Constructor.name}</td>
                                     <td className="py-2 px-4">{constructor.points}</td>

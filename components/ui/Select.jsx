@@ -1,9 +1,10 @@
 import React from 'react';
+import classNames from 'classnames';
 
-const Select = ({ children, className, ...props }) => (
-    <select className={`p-2 rounded ${className}`} {...props}>
-        {children}
-    </select>
-);
-
-export default Select;
+export const Select = ({ children, className, ...props }) => {
+    return (
+        <select className={classNames("p-2 rounded bg-gray-800 text-white", className)} {...props}>
+            {children}
+        </select>
+    );
+};
