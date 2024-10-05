@@ -1,74 +1,128 @@
-import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
-import { useMediaQuery } from 'react-responsive';
-import Link from 'next/link';
-import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '@/components/Navbar';
-import RaceResultsTable from '@/components/RaceResultsTable';
-import LapTimeComparison from '@/components/LapTimeComparison';
-import Standings from '@/components/Standings';
+import Image from 'next/image';
+import { Michroma } from 'next/font/google';
+import { RaceResults } from '@/components/RaceResults';
+import Link from 'next/link';
 
-// Dynamically import the LapTimesChart component with SSR disabled
-const LapTimesChart = dynamic(() => import('@/components/LapTimesChart'), { ssr: false });
+const michroma = Michroma({ subsets: ["latin"], weight: ["400"] });
 
-// Add the convertCountry object
-const convertCountry = {
-  "UK": "GB",
-  "USA": "US",
-  "UAE": "AE",
-  // Add more country mappings as needed
+const countryFlags = {
+  'Australia': 'AU',
+  'Austria': 'AT',
+  'Azerbaijan': 'AZ',
+  'Bahrain': 'BH',
+  'Belgium': 'BE',
+  'Brazil': 'BR',
+  'Canada': 'CA',
+  'China': 'CN',
+  'France': 'FR',
+  'Germany': 'DE',
+  'Hungary': 'HU',
+  'Italy': 'IT',
+  'Japan': 'JP',
+  'Mexico': 'MX',
+  'Monaco': 'MC',
+  'Netherlands': 'NL',
+  'Portugal': 'PT',
+  'Russia': 'RU',
+  'Saudi Arabia': 'SA',
+  'Singapore': 'SG',
+  'Spain': 'ES',
+  'United Arab Emirates': 'AE',
+  'United Kingdom': 'GB',
+  'United States': 'US',
+  'Vietnam': 'VN',
 };
 
-export default function RaceResults() {
+const SearchByRace = () => {
   const router = useRouter();
   const { race } = router.query;
+  const [year, setYear] = useState('');
+  const [round, setRound] = useState('');
   const [raceData, setRaceData] = useState(null);
-  const [lapTimes, setLapTimes] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (race) {
-      const fetchRaceData = async () => {
-        const response = await fetch(`/api/getRaceResults/${race[0]}/${race[1]}`);
-        const data = await response.json();
-        setRaceData(data.RaceData?.MRData?.RaceTable?.Races[0]);
-      };
-
-      const fetchLapTimes = async () => {
-        const response = await fetch(`/api/getLapTimes/${race[0]}/${race[1]}`);
-        const data = await response.json();
-        setLapTimes(data.LapTimes);
-      };
-
-      fetchRaceData();
-      fetchLapTimes();
+    if (race && race.length === 2) {
+      setYear(race[0]);
+      setRound(race[1]);
     }
   }, [race]);
 
-  if (!raceData || !lapTimes) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (year && round) {
+      fetchRaceData();
+    }
+  }, [year, round]);
 
-  const year = race[0];
+  const fetchRaceData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`http://ergast.com/api/f1/${year}/${round}/results.json`);
+      const data = await response.json();
+      setRaceData(data.MRData.RaceTable.Races[0]);
+    } catch (err) {
+      setError('Failed to fetch race data');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!raceData) return null;
+
+  const { raceName, Circuit, date } = raceData;
+  const flagCode = countryFlags[Circuit.Location.country] || 'unknown';
 
   return (
-    <div className="min-h-screen bg-black text-white bg-[url('/assets/images/f1-background3.png')] bg-cover bg-center bg-fixed">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8 bg-black bg-opacity-75">
-        <h1 className="text-3xl font-bold mb-6 mt-16">{raceData.raceName}</h1>
-        <div className="mt-8"> {/* Added margin top here */}
-          <h2 className="text-2xl font-bold mb-4">Race Results</h2>
-          <RaceResultsTable results={raceData.Results} />
-        </div>
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-4">Lap Time Comparison</h2>
-          <LapTimeComparison raceData={raceData} lapTimes={lapTimes} />
-        </div>
-        <div className="mt-12">
-          <Standings year={year} />
+    <div className="min-h-screen bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
+      <div className="min-h-screen bg-black bg-opacity-50">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-white">
+            <h1 className={`${michroma.className} text-3xl font-bold mb-4`}>{raceName} {year}</h1>
+            <div className="mb-4 flex items-center">
+              {flagCode !== 'unknown' ? (
+                <Image
+                  src={`https://flagsapi.com/${flagCode}/flat/64.png`}
+                  alt={`${Circuit.Location.country} flag`}
+                  width={64}
+                  height={64}
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gray-300 flex items-center justify-center text-gray-500">
+                  No flag
+                </div>
+              )}
+              <span className="ml-4">{Circuit.Location.country}</span>
+            </div>
+            <p>Date: {date}</p>
+            <p>Circuit: {Circuit.circuitName}</p>
+            <p>Location: {Circuit.Location.locality}, {Circuit.Location.country}</p>
+
+            {/* New Back Button */}
+            <div className="mt-4 mb-6">
+              <Link href="/search-by-race" passHref>
+                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                  <span className="mr-2">←</span> Back to Search
+                </button>
+              </Link>
+            </div>
+
+            <div className="mt-6">
+              <RaceResults raceData={raceData} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SearchByRace;

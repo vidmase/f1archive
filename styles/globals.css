@@ -212,3 +212,9 @@ select {
   right: 0;
   left: auto;
 }
+
+@layer utilities {
+  .bg-gray-750 {
+    background-color: #2D3748;
+  }
+}

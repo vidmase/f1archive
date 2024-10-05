@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const LapTimeComparison = ({ raceData, lapTimes }) => {
+const LapTimeComparison = ({ raceData, selectedDrivers }) => {
     const [drivers, setDrivers] = useState([]);
-    const [selectedDrivers, setSelectedDrivers] = useState([]);
     const [selectedLap, setSelectedLap] = useState(1);
     const [comparisonData, setComparisonData] = useState(null);
     const [error, setError] = useState(null);
+    const [totalLaps, setTotalLaps] = useState(0);
+    const [lapTimes, setLapTimes] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (raceData && raceData.Results) {
@@ -19,10 +21,23 @@ const LapTimeComparison = ({ raceData, lapTimes }) => {
         }
     }, [raceData]);
 
-    const handleDriverSelect = (event) => {
-        const driverId = event.target.value;
-        if (selectedDrivers.length < 5 && !selectedDrivers.includes(driverId)) {
-            setSelectedDrivers([...selectedDrivers, driverId]);
+    const fetchLapTimes = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const season = raceData.season;
+            const round = raceData.round;
+            const response = await axios.get(`http://ergast.com/api/f1/${season}/${round}/laps.json?limit=2000`);
+            const fetchedLapTimes = response.data.MRData.RaceTable.Races[0].Laps;
+            setLapTimes(fetchedLapTimes);
+            setTotalLaps(fetchedLapTimes.length);
+            setLoading(false);
+            return fetchedLapTimes;
+        } catch (err) {
+            console.error('Error fetching lap times:', err);
+            setError('Failed to fetch lap times. Please try again.');
+            setLoading(false);
+            return null;
         }
     };
 
@@ -31,28 +46,42 @@ const LapTimeComparison = ({ raceData, lapTimes }) => {
         setError(null);
     };
 
-    const handleCompare = () => {
-        if (selectedDrivers.length >= 2 && selectedDrivers.length <= 5) {
-            if (selectedLap > lapTimes.length) {
-                setError("Must've exceeded track limits and got deleted by the stewards :)");
-                setComparisonData(null);
-            } else {
-                setError(null);
-                compareLapTimes();
-            }
-        }
-    };
-
-    const compareLapTimes = () => {
-        if (!Array.isArray(lapTimes) || lapTimes.length === 0) {
-            setError("No lap time data available.");
+    const handleCompare = async () => {
+        if (selectedDrivers.length < 2 || selectedDrivers.length > 5) {
+            setError("Please select between 2 and 5 drivers.");
             setComparisonData(null);
             return;
         }
 
-        const selectedLapData = lapTimes.find(lap => lap.number === selectedLap.toString());
+        setLoading(true);
+        let lapTimesData = lapTimes;
+        if (!lapTimesData) {
+            lapTimesData = await fetchLapTimes();
+        }
+
+        if (!lapTimesData || lapTimesData.length === 0) {
+            setError("No lap times data available for this race.");
+            setComparisonData(null);
+            setLoading(false);
+            return;
+        }
+
+        if (selectedLap > lapTimesData.length) {
+            setError(`Selected lap (${selectedLap}) exceeds total laps (${lapTimesData.length}).`);
+            setComparisonData(null);
+            setLoading(false);
+            return;
+        }
+
+        compareLapTimes(lapTimesData);
+        setLoading(false);
+    };
+
+    const compareLapTimes = (lapTimesData) => {
+        const selectedLapData = lapTimesData.find(lap => parseInt(lap.number) === selectedLap);
+
         if (!selectedLapData || !selectedLapData.Timings) {
-            setError("No data available for this lap.");
+            setError(`No data available for lap ${selectedLap}.`);
             setComparisonData(null);
             return;
         }
@@ -64,98 +93,43 @@ const LapTimeComparison = ({ raceData, lapTimes }) => {
                 lapTime: driverLap ? driverLap.time : 'N/A'
             };
         });
-        setComparisonData(comparisonResult);
+
+        if (comparisonResult.every(result => result.lapTime === 'N/A')) {
+            setError(`No lap time data available for selected drivers on lap ${selectedLap}.`);
+            setComparisonData(null);
+        } else {
+            setComparisonData(comparisonResult);
+        }
     };
 
-    const resetSelectedDrivers = () => {
-        setSelectedDrivers([]);
-        setComparisonData(null);
-        setError(null);
+    const convertToSeconds = (timeString) => {
+        const [minutes, seconds] = timeString.split(':');
+        return parseFloat(minutes) * 60 + parseFloat(seconds);
     };
-
-    const removeDriver = (driverId) => {
-        setSelectedDrivers(selectedDrivers.filter(id => id !== driverId));
-        setComparisonData(null);
-        setError(null);
-    };
-
-
 
     return (
         <div className="w-full bg-gray-900 p-4 rounded-lg">
-            <h2 className="text-xl font-bold text-white mb-8 text-center">
-
-                {raceData && raceData.raceName && ` - ${raceData.raceName}`}
-                {raceData && raceData.season && ` ${raceData.season}`}
-
-            </h2>
-
-            <div className="mb-4">
-                <label className="text-white mr-2">Select Drivers (2-5):</label>
-                <select
-                    onChange={handleDriverSelect}
-                    className="bg-gray-800 text-white p-2 rounded w-full md:w-auto"
-                    value=""
-                    disabled={selectedDrivers.length >= 5}
-                >
-                    <option value="">Select a driver</option>
-                    {drivers.map(driver => (
-                        <option key={driver.driverId} value={driver.driverId}>
-                            {`${driver.givenName} ${driver.familyName}`}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="mb-4">
-                <h3 className="text-white mb-2">Selected Drivers:</h3>
-                <div className="flex flex-col space-y-4">
-                    {selectedDrivers.map(driverId => {
-                        const driver = drivers.find(d => d.driverId === driverId);
-                        return (
-                            <div key={driverId} className="flex items-center justify-between bg-red-800 p-2 rounded">
-                                <span className="text-white text-xl">{`${driver.givenName} ${driver.familyName}`}</span>
-                                <button
-                                    onClick={() => removeDriver(driverId)}
-                                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition duration-300"
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        );
-                    })}
-                </div>
-                {selectedDrivers.length > 0 && (
-                    <button
-                        onClick={resetSelectedDrivers}
-                        className="bg-gray-600 text-white px-2 py-1 rounded hover:bg-gray-700 transition duration-300 mt-2"
-                    >
-                        Reset All
-                    </button>
-                )}
-            </div>
-
             <div className="mb-4">
                 <label className="text-white mr-2">Select Lap:</label>
                 <input
                     type="number"
                     min="1"
-                    max={lapTimes.length}
+                    max={totalLaps}
                     value={selectedLap}
                     onChange={handleLapChange}
                     className="bg-gray-800 text-white p-2 rounded w-full md:w-auto"
                 />
                 <span className="text-white ml-2">
-                    (Total laps: {lapTimes.length})
+                    (Total laps: {totalLaps})
                 </span>
             </div>
 
             <button
                 onClick={handleCompare}
                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-300 w-full md:w-auto"
-                disabled={selectedDrivers.length < 2 || selectedDrivers.length > 5}
+                disabled={selectedDrivers.length < 2 || loading}
             >
-                Compare
+                {loading ? 'Loading...' : 'Compare'}
             </button>
 
             {error && (
@@ -165,31 +139,45 @@ const LapTimeComparison = ({ raceData, lapTimes }) => {
             )}
 
             {comparisonData && (
-                <div className="mt-4">
-                    <h3 className="text-lg font-bold text-white mb-2">Comparison Results:</h3>
-                    <table className="w-full text-white">
-                        <thead>
-                            <tr className="bg-gray-800">
-                                <th className="p-2">Driver</th>
-                                <th className="p-2">Lap Time</th>
-                                <th className="p-2">Difference</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {comparisonData.map((result, index) => {
-                                const driver = drivers.find(d => d.driverId === result.driverId);
-                                const fastestTime = Math.min(...comparisonData.map(r => r.lapTime !== 'N/A' ? parseFloat(r.lapTime) : Infinity));
-                                const difference = result.lapTime !== 'N/A' ? (parseFloat(result.lapTime) - fastestTime).toFixed(3) : 'N/A';
-                                return (
-                                    <tr key={result.driverId} className={index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-800'}>
-                                        <td className="p-2">{`${driver.givenName} ${driver.familyName}`}</td>
-                                        <td className="p-2">{result.lapTime}</td>
-                                        <td className="p-2">{difference === '0.000' ? '-' : `+${difference}`}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                <div className="mt-8 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <h3 className="text-xl font-bold text-white bg-red-600 p-4">
+                        Comparison Results
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-white">
+                            <thead>
+                                <tr className="bg-gray-700">
+                                    <th className="p-3 text-left">Driver</th>
+                                    <th className="p-3 text-left">Lap Time</th>
+                                    <th className="p-3 text-left">Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {comparisonData.map((result, index) => {
+                                    const driver = drivers.find(d => d.driverId === result.driverId);
+                                    const fastestTime = Math.min(...comparisonData.map(r => r.lapTime !== 'N/A' ? convertToSeconds(r.lapTime) : Infinity));
+                                    const timeDiff = result.lapTime !== 'N/A' ? convertToSeconds(result.lapTime) - fastestTime : null;
+
+                                    return (
+                                        <tr key={result.driverId} className={index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-750'}>
+                                            <td className="p-3 flex items-center space-x-2">
+                                                <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold">
+                                                    {driver?.givenName[0]}
+                                                </div>
+                                                <span>{driver ? `${driver.givenName} ${driver.familyName}` : result.driverId}</span>
+                                            </td>
+                                            <td className="p-3 font-mono">
+                                                {result.lapTime}
+                                            </td>
+                                            <td className={`p-3 font-mono ${timeDiff === 0 ? 'text-green-400' : 'text-yellow-400'}`}>
+                                                {timeDiff !== null ? (timeDiff === 0 ? 'Fastest' : `+${timeDiff.toFixed(3)}s`) : '-'}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>
