@@ -1,9 +1,9 @@
+import React from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
-import FeaturedRaces from "@/components/FeaturedRaces";
-import Statistics from "@/components/Statistics";
 import LatestNews from "@/components/LatestNews";
+import { SparkleText } from "@/components/SparkleText";
 
 export default function Home() {
   return (
@@ -22,7 +22,11 @@ export default function Home() {
           <div className="absolute inset-0 bg-black bg-opacity-50"></div>
           <div className="relative z-10 text-center text-white px-4">
             <h1 className="text-focus-in text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 font-michroma">
-              Welcome to the F1 Archive
+              Welcome to the{' '}
+              <SparkleText>
+                <span className="text-red-600">F1</span>
+              </SparkleText>
+              {' '}Archive
             </h1>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-8 font-yanone-kaffeesatz">
               Explore the rich history of Formula 1 racing
@@ -32,7 +36,6 @@ export default function Home() {
             </Link>
           </div>
         </div>
-
         <LatestNews />
       </div>
     </>

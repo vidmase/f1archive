@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from 'axios';
+import { SparkleText } from "@/components/SparkleText";
 
 const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
@@ -52,13 +53,15 @@ const Navbar = () => {
         <div className="flex justify-center items-center py-4 relative">
           <div className="w-full overflow-hidden">
             <Link href="/" className="block w-fit mx-auto">
-              <Image
-                src="/assets/images/F1.png"
-                width={100}
-                height={25}
-                alt="F1 Logo"
-                className="slide-in-blurred-left"
-              />
+              <SparkleText>
+                <Image
+                  src="/assets/images/F1.png"
+                  width={100}
+                  height={25}
+                  alt="F1 Logo"
+                  className="slide-in-blurred-left"
+                />
+              </SparkleText>
             </Link>
           </div>
         </div>
