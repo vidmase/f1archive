@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { FaTimes, FaFlag, FaClock, FaTrophy, FaCar } from 'react-icons/fa';
-import { HelmIcon, PodiumIcon, SpeedometerIcon } from './F1Icons';
+import { UserCircleIcon, ClockIcon, FireIcon } from '@heroicons/react/24/outline';
 
 const nationalityToCountryCode = {
     'British': 'GB',
@@ -70,17 +69,11 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
         return null;
     };
 
-    const cardVariants = {
-        hidden: { opacity: 0, y: 20, scale: 0.8 },
-        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, type: 'spring', stiffness: 300, damping: 24 } },
-        exit: { opacity: 0, y: 20, scale: 0.8, transition: { duration: 0.2 } }
-    };
-
     const tabContent = {
         info: (
             <>
                 <p className="text-gray-300 mb-2">
-                    <HelmIcon className="inline-block w-5 h-5 mr-2 text-red-500" />
+                    <span className="inline-block w-5 h-5 mr-2 text-red-500">🏎️</span>
                     Number: {driver.permanentNumber}
                 </p>
                 <p className="text-gray-300 mb-2">
@@ -95,8 +88,7 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
         race: (
             <>
                 <p className="text-gray-300 mb-2">
-                    <PodiumIcon className="inline-block w-5 h-5 mr-2 text-yellow-500" />
-                    Position: {result.position}
+                    🏁 Position: {result.position}
                 </p>
                 <p className="text-gray-300 mb-2">
                     💯 Points: {result.points}
@@ -124,15 +116,13 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
         fastest: result.FastestLap && (
             <>
                 <p className="text-gray-300 mb-2">
-                    <FaTrophy className="inline-block text-yellow-500 mr-2" />
-                    Fastest Lap: {result.FastestLap.lap}
+                    🏆 Fastest Lap: {result.FastestLap.lap}
                 </p>
                 <p className="text-gray-300 mb-2">
                     ⚡ Lap Time: {result.FastestLap.Time.time}
                 </p>
                 <p className="text-gray-300 mb-2">
-                    <SpeedometerIcon className="inline-block w-5 h-5 mr-2 text-blue-500" />
-                    Average Speed: {result.FastestLap.AverageSpeed.speed} {result.FastestLap.AverageSpeed.units}
+                    🚀 Average Speed: {result.FastestLap.AverageSpeed.speed} {result.FastestLap.AverageSpeed.units}
                 </p>
             </>
         )
@@ -142,22 +132,24 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
         <AnimatePresence>
             {isOpen && (
                 <motion.div
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="absolute z-10 bg-gray-800 p-4 rounded-lg shadow-lg w-96 bottom-full mb-2 left-1/2 transform -translate-x-1/2"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute z-10 bg-gray-800 p-6 rounded-lg shadow-lg w-96 bottom-full mb-2 left-1/2 transform -translate-x-1/2"
                     style={{ boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)' }}
                 >
                     <button
                         onClick={onClose}
                         className="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
-                        <FaTimes />
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                     <div className="flex flex-col items-center">
                         {imageUrl && (
-                            <div className="relative w-full h-48 mb-4 overflow-hidden rounded-t-lg">
+                            <div className="relative w-full h-48 mb-4 overflow-hidden rounded-lg">
                                 <Image
                                     src={imageUrl}
                                     alt={`${driver.givenName} ${driver.familyName}`}
@@ -174,10 +166,25 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
                         <p className="text-xl text-red-500 font-semibold mb-4">{result.Constructor.name}</p>
 
                         <div className="flex justify-center space-x-2 mb-4">
-                            <TabButton icon={<HelmIcon className="w-5 h-5" />} active={activeTab === 'info'} onClick={() => setActiveTab('info')} />
-                            <TabButton icon={<FaClock />} active={activeTab === 'race'} onClick={() => setActiveTab('race')} />
+                            <TabButton
+                                icon={<UserCircleIcon />}
+                                active={activeTab === 'info'}
+                                onClick={() => setActiveTab('info')}
+                                tooltip="Info"
+                            />
+                            <TabButton
+                                icon={<ClockIcon />}
+                                active={activeTab === 'race'}
+                                onClick={() => setActiveTab('race')}
+                                tooltip="Race"
+                            />
                             {result.FastestLap && (
-                                <TabButton icon={<SpeedometerIcon className="w-5 h-5" />} active={activeTab === 'fastest'} onClick={() => setActiveTab('fastest')} />
+                                <TabButton
+                                    icon={<FireIcon />}
+                                    active={activeTab === 'fastest'}
+                                    onClick={() => setActiveTab('fastest')}
+                                    tooltip="Fastest"
+                                />
                             )}
                         </div>
 
@@ -188,6 +195,7 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.2 }}
+                                className="w-full"
                             >
                                 {tabContent[activeTab]}
                             </motion.div>
@@ -199,14 +207,21 @@ const DriverCard = ({ driver, result, isOpen, onClose }) => {
     );
 };
 
-const TabButton = ({ icon, active, onClick }) => (
-    <button
-        onClick={onClick}
-        className={`p-2 rounded-full transition-colors duration-200 ${active ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-    >
-        {icon}
-    </button>
+const TabButton = ({ icon, active, onClick, tooltip }) => (
+    <div className="relative group">
+        <button
+            onClick={onClick}
+            className={`p-2 rounded-md transition-colors duration-200 ${active
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                }`}
+        >
+            {React.cloneElement(icon, { className: 'w-5 h-5' })}
+        </button>
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {tooltip}
+        </div>
+    </div>
 );
 
 export default DriverCard;
