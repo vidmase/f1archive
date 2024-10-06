@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Michroma } from 'next/font/google';
 import { RaceResults } from '@/components/RaceResults';
 import Link from 'next/link';
+import Head from 'next/head';
 
 const michroma = Michroma({ subsets: ["latin"], weight: ["400"] });
 
@@ -44,6 +45,7 @@ const SearchByRace = () => {
   const [raceData, setRaceData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (race && race.length === 2) {
@@ -58,6 +60,18 @@ const SearchByRace = () => {
     }
   }, [year, round]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on mount
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const fetchRaceData = async () => {
     setLoading(true);
     setError(null);
@@ -70,6 +84,13 @@ const SearchByRace = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (year && round) {
+      router.push(`/race-results?year=${year}&round=${round}`);
     }
   };
 
@@ -88,18 +109,12 @@ const SearchByRace = () => {
           <div className="text-white">
             <h1 className={`${michroma.className} text-3xl font-bold mb-4`}>{raceName} {year}</h1>
             <div className="mb-4 flex items-center">
-              {flagCode !== 'unknown' ? (
-                <Image
-                  src={`https://flagsapi.com/${flagCode}/flat/64.png`}
-                  alt={`${Circuit.Location.country} flag`}
-                  width={64}
-                  height={64}
-                />
-              ) : (
-                <div className="w-16 h-16 bg-gray-300 flex items-center justify-center text-gray-500">
-                  No flag
-                </div>
-              )}
+              <Image
+                src={`https://flagsapi.com/${flagCode}/flat/64.png`}
+                alt={`${Circuit.Location.country} flag`}
+                width={64}
+                height={64}
+              />
               <span className="ml-4">{Circuit.Location.country}</span>
             </div>
             <p>Date: {date}</p>
