@@ -103,7 +103,7 @@ const SearchByRace = () => {
 
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
-      <div className="min-h-screen bg-black bg-opacity-100">
+      <div className="min-h-screen bg-black bg-opacity-50">
         <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="text-white">
