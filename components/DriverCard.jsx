@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -212,8 +212,8 @@ const TabButton = ({ icon, active, onClick, tooltip }) => (
         <button
             onClick={onClick}
             className={`p-2 rounded-md transition-colors duration-200 ${active
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
                 }`}
         >
             {React.cloneElement(icon, { className: 'w-5 h-5' })}

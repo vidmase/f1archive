@@ -47,6 +47,7 @@ const SearchByRace = () => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
+
   useEffect(() => {
     if (race && race.length === 2) {
       setYear(race[0]);
@@ -102,13 +103,13 @@ const SearchByRace = () => {
   const flagCode = countryFlags[Circuit.Location.country] || 'unknown';
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
-      <div className="min-h-screen bg-black bg-opacity-50">
+    <div className="min-h-screen bg-cover bg-center bg-fixed bg-opacity-50" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
+      <div className="min-h-screen bg-gray-900 bg-opacity-50" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
         <Navbar />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-11" style={{ backgroundImage: "url('/assets/images/f1-background3.png')" }}>
           <div className="text-white">
-            <h1 className={`${michroma.className} text-3xl font-bold mb-4`}>{raceName} {year}</h1>
-            <div className="mb-4 flex items-center">
+            <h1 className={`${michroma.className} text-2xl font-bold mb-2`}>{raceName} {year}</h1>
+            <div className="mb-4 flex items-center" style={{ marginTop: '-10px' }}>
               <Image
                 src={`https://flagsapi.com/${flagCode}/flat/64.png`}
                 alt={`${Circuit.Location.country} flag`}
@@ -124,14 +125,14 @@ const SearchByRace = () => {
             {/* New Back Button */}
             <div className="mt-4 mb-6">
               <Link href="/search-by-race" passHref>
-                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50" style={{ marginTop: '-10px' }}>
                   <span className="mr-2">←</span> Back to Search
                 </button>
               </Link>
             </div>
 
             <div className="mt-6">
-              <RaceResults raceData={raceData} />
+              <RaceResults raceId={`${year}-${round}`} />
             </div>
           </div>
         </div>
