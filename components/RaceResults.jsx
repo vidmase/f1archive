@@ -1,15 +1,39 @@
 "use client";
-import React, { useState, useRef, useId } from "react";
+import React, { useState, useRef, useId, useEffect } from "react";
+import Image from 'next/image';
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import LapTimeComparison from "@/components/LapTimeComparison";
 import DriverCard from "@/components/DriverCard";
+import axios from 'axios';
 
 export function RaceResults({ raceData }) {
     const [selectedDrivers, setSelectedDrivers] = useState([]);
     const [hoveredDriver, setHoveredDriver] = useState(null);
+    const [driverImages, setDriverImages] = useState({});
     const ref = useRef(null);
     const id = useId();
+
+    useEffect(() => {
+        const fetchDriverImages = async () => {
+            const images = {};
+            for (const result of raceData.Results) {
+                try {
+                    const response = await axios.get(`https://www.formula1.com/en/drivers/${result.Driver.driverId}.html`);
+                    const html = response.data;
+                    const match = html.match(/<img class="profile-img".*?src="(.*?)"/);
+                    if (match && match[1]) {
+                        images[result.Driver.driverId] = match[1];
+                    }
+                } catch (error) {
+                    console.error(`Error fetching image for ${result.Driver.driverId}:`, error);
+                }
+            }
+            setDriverImages(images);
+        };
+
+        fetchDriverImages();
+    }, [raceData]);
 
     const handleDriverSelection = (driverId) => {
         setSelectedDrivers(prev => {
@@ -87,7 +111,16 @@ export function RaceResults({ raceData }) {
                                 onMouseEnter={() => setHoveredDriver(result.Driver.driverId)}
                                 onMouseLeave={() => setHoveredDriver(null)}
                             >
-                                <span className="relative inline-block">
+                                <span className="relative inline-flex items-center">
+                                    {driverImages[result.Driver.driverId] && (
+                                        <Image
+                                            src={driverImages[result.Driver.driverId]}
+                                            alt={`${result.Driver.givenName} ${result.Driver.familyName}`}
+                                            width={30}
+                                            height={30}
+                                            className="rounded-full mr-2"
+                                        />
+                                    )}
                                     {result.Driver.givenName} {result.Driver.familyName}
                                     <DriverCard
                                         driver={result.Driver}
