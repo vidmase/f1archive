@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import { cn } from "@/lib/utils";
 import { cacheImage, getCachedImage } from "../utils/imageCache";
-import LapTimeComparison from "@/components/LapTimeComparison"; // Import the LapTimeComparison component
+import LapTimeComparison from "@/components/LapTimeComparison";
 
 export function RaceResults({ raceData }) {
     const [active, setActive] = useState(null);
@@ -34,7 +34,34 @@ export function RaceResults({ raceData }) {
         });
     };
 
-    if (!raceData || !raceData.Results) return null;
+    const formatTime = (result) => {
+        if (result.status === 'Finished') {
+            if (result.Time && result.Time.time) {
+                return result.Time.time;
+            } else if (result.Time && result.Time.millis) {
+                const milliseconds = parseInt(result.Time.millis);
+                const minutes = Math.floor(milliseconds / 60000);
+                const seconds = ((milliseconds % 60000) / 1000).toFixed(3);
+                return `${minutes}:${seconds.padStart(6, '0')}`;
+            }
+        }
+
+        // For drivers who finished but were lapped
+        if (result.status.startsWith('+')) {
+            return result.status; // This will show something like "+1 Lap"
+        }
+
+        // For drivers who didn't finish, return their status
+        return result.status; // This will show "DNF", "DSQ", etc.
+    };
+
+    if (!raceData || !raceData.Results) {
+        return (
+            <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-900"></div>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -55,7 +82,7 @@ export function RaceResults({ raceData }) {
                         <th className="p-2">Driver</th>
                         <th className="p-2">Team</th>
                         <th className="p-2">Points</th>
-                        <th className="p-2">Status</th>
+                        <th className="p-2">Time</th>
                         <th className="p-2 text-left">Compare</th>
                     </tr>
                 </thead>
@@ -74,7 +101,14 @@ export function RaceResults({ raceData }) {
                             </td>
                             <td className="p-2">{result.Constructor.name}</td>
                             <td className="p-2">{result.points}</td>
-                            <td className="p-2">{result.status}</td>
+                            <td className={`p-2 ${result.status === 'Finished'
+                                    ? 'text-green-400'
+                                    : result.status.startsWith('+')
+                                        ? 'text-yellow-400'
+                                        : 'text-red-400'
+                                }`}>
+                                {formatTime(result)}
+                            </td>
                             <td className="p-2">
                                 <input
                                     type="checkbox"
@@ -100,33 +134,3 @@ export function RaceResults({ raceData }) {
         </>
     );
 }
-
-const CloseIcon = () => {
-    return (
-        <motion.svg
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4 text-black"
-        >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M18 6l-12 12" />
-            <path d="M6 6l12 12" />
-        </motion.svg>
-    );
-};
-
-const LoadingSpinner = () => (
-    <div className="flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-900"></div>
-    </div>
-);
