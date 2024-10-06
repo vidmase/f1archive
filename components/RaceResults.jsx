@@ -1,27 +1,15 @@
 "use client";
-import Image from "next/image";
-import React, { useEffect, useId, useRef, useState, useCallback } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useOutsideClick } from "@/hooks/use-outside-click";
+import React, { useState, useRef, useId } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { cacheImage, getCachedImage } from "../utils/imageCache";
 import LapTimeComparison from "@/components/LapTimeComparison";
+import DriverCard from "@/components/DriverCard";
 
 export function RaceResults({ raceData }) {
-    const [active, setActive] = useState(null);
-    const [imageLoading, setImageLoading] = useState(true);
-    const [imageUrl, setImageUrl] = useState(null);
     const [selectedDrivers, setSelectedDrivers] = useState([]);
+    const [hoveredDriver, setHoveredDriver] = useState(null);
     const ref = useRef(null);
     const id = useId();
-
-    useOutsideClick(ref, () => setActive(null));
-
-    const getDriverImageUrl = (driverId) => {
-        // Convert driverId to the format used by F1's CDN
-        const formattedId = driverId.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-        return `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/2023drivers/${formattedId}.png.transform/2col/image.png`;
-    };
 
     const handleDriverSelection = (driverId) => {
         setSelectedDrivers(prev => {
@@ -46,13 +34,11 @@ export function RaceResults({ raceData }) {
             }
         }
 
-        // For drivers who finished but were lapped
         if (result.status.startsWith('+')) {
-            return result.status; // This will show something like "+1 Lap"
+            return result.status;
         }
 
-        // For drivers who didn't finish, return their status
-        return result.status; // This will show "DNF", "DSQ", etc.
+        return result.status;
     };
 
     if (!raceData || !raceData.Results) {
@@ -91,21 +77,33 @@ export function RaceResults({ raceData }) {
                         <tr
                             key={result.Driver.driverId}
                             className={cn(
-                                "border-b bg-gray-800 border-gray-700",
-                                active === index && "bg-gray-600"
+                                "border-b bg-gray-800 border-gray-700 hover:bg-gray-700 transition-colors duration-200",
+                                hoveredDriver === result.Driver.driverId && "bg-gray-700"
                             )}
                         >
                             <td className="p-2">{result.position}</td>
-                            <td className="p-2 font-medium text-white whitespace-nowrap">
-                                {result.Driver.givenName} {result.Driver.familyName}
+                            <td
+                                className="p-2 font-medium text-white whitespace-nowrap relative"
+                                onMouseEnter={() => setHoveredDriver(result.Driver.driverId)}
+                                onMouseLeave={() => setHoveredDriver(null)}
+                            >
+                                <span className="relative inline-block">
+                                    {result.Driver.givenName} {result.Driver.familyName}
+                                    <DriverCard
+                                        driver={result.Driver}
+                                        result={result}
+                                        isOpen={hoveredDriver === result.Driver.driverId}
+                                        onClose={() => setHoveredDriver(null)}
+                                    />
+                                </span>
                             </td>
                             <td className="p-2">{result.Constructor.name}</td>
                             <td className="p-2">{result.points}</td>
                             <td className={`p-2 ${result.status === 'Finished'
-                                    ? 'text-green-400'
-                                    : result.status.startsWith('+')
-                                        ? 'text-yellow-400'
-                                        : 'text-red-400'
+                                ? 'text-green-400'
+                                : result.status.startsWith('+')
+                                    ? 'text-yellow-400'
+                                    : 'text-red-400'
                                 }`}>
                                 {formatTime(result)}
                             </td>
