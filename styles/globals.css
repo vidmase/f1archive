@@ -7,7 +7,16 @@
 
 @layer base {
   body {
-    @apply font-michroma;
+    @apply font-michroma bg-gray-900 text-gray-200; /* Default dark theme */
+    background-image: url('/assets/images/f1-background3.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Keep background fixed during scroll */
+    background-repeat: no-repeat;
+  }
+
+  html, body {
+    min-height: 100vh; /* Ensure body takes full viewport height */
   }
 
   .subheading {
@@ -47,6 +56,7 @@
     --radius: 0.5rem;
   }
 
+  /* Dark theme variables override */
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -82,10 +92,10 @@
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
+  /* Removed bg-background and text-foreground from here as they are applied above with background image */
 }
+
+/* Other styles remain unchanged... */
 
 h1,
 h2,
